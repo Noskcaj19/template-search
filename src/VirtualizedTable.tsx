@@ -76,7 +76,7 @@ export function VirtualizedTable({
                 return (
                   <tr
                     key={originalIndex}
-                    data-index={originalIndex}
+                    data-index={displayIndex}
                     ref={measureElement}
                     style={{
                       position: 'absolute',
