@@ -3,6 +3,8 @@ import mammoth from 'mammoth'
 import { Document, Packer, Table, TableRow as DocxTableRow, TableCell, Paragraph, TextRun, WidthType } from 'docx'
 import { saveAs } from 'file-saver'
 import { VirtualizedTable } from './VirtualizedTable'
+import { EditorProvider } from './EditorContext'
+import { FormattingToolbar } from './FormattingToolbar'
 import './App.css'
 
 type TableRow = {
@@ -243,47 +245,51 @@ function App() {
   }
 
   return (
-    <div className="app">
-      <h1>Template Search</h1>
-      <input
-        type="file"
-        accept=".docx"
-        onChange={handleFileUpload}
-      />
+    <EditorProvider>
+      <div className="app">
+        <div className="top-bar">
+          <h1>Template Search</h1>
+          <FormattingToolbar />
+          {tableData.length > 0 && (
+            <button className="download-btn" onClick={handleDownload}>
+              Download as Word
+            </button>
+          )}
+        </div>
+        <input
+          type="file"
+          accept=".docx"
+          onChange={handleFileUpload}
+        />
 
-      {tableData.length > 0 && (
-        <button className="download-btn" onClick={handleDownload}>
-          Download as Word
-        </button>
-      )}
+        {error && <p className="error">{error}</p>}
 
-      {error && <p className="error">{error}</p>}
-
-      {tableData.length > 0 && (
-        <>
-          <div className="search-bar">
-            <input
-              type="search"
-              placeholder="Search all columns..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+        {tableData.length > 0 && (
+          <>
+            <div className="search-bar">
+              <input
+                type="search"
+                placeholder="Search all columns..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {searchQuery && (
+                <span className="search-results-count">
+                  {displayData.length} of {tableData.length} rows
+                </span>
+              )}
+            </div>
+            <VirtualizedTable
+              data={displayData}
+              rowIndexes={displayIndexes}
+              activeCell={activeCell}
+              onCellChange={updateCell}
+              onCellFocus={(rowIndex, column) => setActiveCell({ rowIndex, column })}
             />
-            {searchQuery && (
-              <span className="search-results-count">
-                {displayData.length} of {tableData.length} rows
-              </span>
-            )}
-          </div>
-          <VirtualizedTable
-            data={displayData}
-            rowIndexes={displayIndexes}
-            activeCell={activeCell}
-            onCellChange={updateCell}
-            onCellFocus={(rowIndex, column) => setActiveCell({ rowIndex, column })}
-          />
-        </>
-      )}
-    </div>
+          </>
+        )}
+      </div>
+    </EditorProvider>
   )
 }
 
