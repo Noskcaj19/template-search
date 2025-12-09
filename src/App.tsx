@@ -157,7 +157,13 @@ function App() {
   )
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tableData))
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tableData))
+    } catch (e) {
+      if (e instanceof DOMException && e.name === 'QuotaExceededError') {
+        console.warn('localStorage quota exceeded, data not saved')
+      }
+    }
   }, [tableData])
   const [error, setError] = useState<string | null>(null)
 
